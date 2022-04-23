@@ -1,0 +1,15 @@
+syntax = "proto3";
+option go_package = "mel.ronald/juegos/pb";
+
+service Juegos {
+    rpc Jugar (Partida) returns (Resultado);
+}
+
+message Partida {
+    int32 Juego = 1;
+    int32 Jugadores = 2;
+}
+
+message Resultado {
+    int32 Error = 1;
+}
