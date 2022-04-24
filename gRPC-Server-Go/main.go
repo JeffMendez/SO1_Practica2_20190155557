@@ -9,8 +9,8 @@ import (
     "google.golang.org/grpc"
     "fmt"
     "log"
-    //"github.com/optiopay/kafka/v2"
-    //"github.com/optiopay/kafka/v2/proto"
+    "github.com/optiopay/kafka/v2"
+    "github.com/optiopay/kafka/v2/proto"
 )
 
 type servidorJuegos struct {
@@ -78,21 +78,23 @@ func (s *servidorJuegos) Jugar(contexto context.Context, partida *pb.Partida) (*
     if juego < 1 || juego > 5 { return &pb.Resultado{Error: 1}, nil; }
     ganador := jugarJuego(int(juego), int(partida.GetJugadores()))
     ganador = ganador + 0
-    fmt.Print("-> Juego:", juego, " Ganador:", ganador)
+    fmt.Println("-> Juego:", juego, " Ganador:", ganador)
     
     // Producir a servidor de kafka
     conf := kafka.NewBrokerConf("test-client")
     conf.AllowTopicCreation = true
-    broker, err := kafka.Dial([]string{"localhost:9092"}, conf)
+    broker, err := kafka.Dial([]string{"my-cluster-kafka-bootstrap:9092"}, conf)
     if err != nil {
-        log.Fatalf("cannot connect to kafka cluster: %s", err)
+        fmt.Println("cannot connect to kafka cluster: %s", err)
+    } else {
+        defer broker.Close()
+        producer := broker.Producer(kafka.NewProducerConf())
+        msg := &proto.Message{Value: []byte(fmt.Sprintf("%d\t%d\t%d", juego, int(partida.GetJugadores()), ganador))}
+        if _, err := producer.Produce("juegos", 0, msg); err != nil {
+            fmt.Println("cannot produce message to %s:%d: %s", "juegos", 0, err)
+        }
     }
-    defer broker.Close()
-    producer := broker.Producer(kafka.NewProducerConf())
-    msg := &proto.Message{Value: []byte(fmt.Sprintf("%d\t%d\t%d", juego, int(partida.GetJugadores()), ganador))}
-    if _, err := producer.Produce("juegos", 0, msg); err != nil {
-        log.Fatalf("cannot produce message to %s:%d: %s", "juegos", 0, err)
-    }
+    
     return &pb.Resultado{Error: 0}, nil
 }
 

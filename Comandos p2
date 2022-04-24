@@ -1,0 +1,58 @@
+# Crear cluster
+gcloud container clusters create prac2-k8s --num-nodes=1 --tags=allin,allout --machine-type=n1-standard-2 --no-enable-network-policy
+gcloud container clusters get-credentials prac2-k8s --zone=us-central1-a
+kubectl create namespace practica2-201901557
+
+# Kafka ---------------------------------------------------------------------------------------
+kubectl create -f https://strimzi.io/install/latest?namespace=practica2-201901557 -n practica2-201901557
+kubectl apply -f https://strimzi.io/examples/latest/kafka/kafka-persistent-single.yaml -n practica2-201901557 
+kubectl wait kafka/my-cluster --for=condition=Ready --timeout=300s -n practica2-201901557 
+
+# Crear topic (en otra ventana y cerrar) 
+kubectl -n practica2-201901557 run kafka-producer -ti --image=quay.io/strimzi/kafka:0.28.0-kafka-3.1.0 --rm=true --restart=Never -- bin/kafka-console-producer.sh --bootstrap-server my-cluster-kafka-bootstrap:9092 --topic juegos -d
+#kubectl -n kafka run kafka-consumer -ti --image=quay.io/strimzi/kafka:0.28.0-kafka-3.1.0 --rm=true --restart=Never -- bin/kafka-console-consumer.sh --bootstrap-server my-cluster-kafka-bootstrap:9092 --topic juegos --from-beginning
+
+# Imagenes ---------------------------------------------------------------------------------------
+
+# rGrpc go server
+sudo docker build . -t jeffmendezdk/server_grpc_201901557
+sudo docker run -d -p 5505:5505 --name servergrp jeffmendezdk/server_grpc_201901557
+sudo docker image push jeffmendezdk/server_grpc_201901557:latest
+
+# kafka subscriber go
+sudo docker build . -t jeffmendezdk/kafka_subs_201901557
+sudo docker image push jeffmendezdk/kafka_subs_201901557:latest
+
+# rGrpc nodejs cliente
+sudo docker build . -t jeffmendezdk/api_client_grpc_201901557
+sudo docker run -d -p 4505:4505 --name clientegrp jeffmendezdk/api_client_grpc_201901557
+sudo docker image push jeffmendezdk/api_client_grpc_201901557:latest
+
+# Pods LoadBalancer ---------------------------------------------------------------------------------------
+
+# gRPC go server
+kubectl run podgrpc-s --image=jeffmendezdk/server_grpc_201901557 --restart=Never -n practica2-201901557
+kubectl expose pod/podgrpc-s --target-port=5505 --port=5505 --type=LoadBalancer --name=grpc-s-svc -n practica2-201901557
+
+# gRPC nodejs cliente
+kubectl run podgrpc-c --image=jeffmendezdk/api_client_grpc_201901557 --restart=Never -n practica2-201901557
+kubectl expose pod/podgrpc-c --target-port=4505 --port=4505 --type=LoadBalancer --name=grpc-c-svc -n practica2-201901557
+
+# Kafka subscriber go
+kubectl run podkakfa-sb --image=jeffmendezdk/kafka_subs_201901557 --restart=Never -n practica2-201901557
+kubectl expose pod/podkakfa-sb --target-port=6505 --port=6505 --type=LoadBalancer --name=kakfa-sb-svc -n practica2-201901557
+
+# Eliminar
+kubectl delete services grpc-s-svc -n practica2-201901557
+kubectl delete pods podgrpc-s -n practica2-201901557
+kubectl delete services grpc-c-svc -n practica2-201901557
+kubectl delete pods podgrpc-c -n practica2-201901557
+kubectl delete services kakfa-sb-svc -n practica2-201901557
+kubectl delete pods podkakfa-sb -n practica2-201901557
+
+# Logs
+kubectl logs podkakfa-sb -n practica2-201901557
+kubectl logs podgrpc-s -n practica2-201901557
+kubectl logs podgrpc-c -n practica2-201901557
+
+
