@@ -41,11 +41,9 @@ servidor.route({
     handler: function (request, h) {
         // JUEGO
         var partida = request.payload;
-        cliente = new juegos('34.134.111.135:5505', grpc.credentials.createInsecure());
+        cliente = new juegos('0.0.0.0:5505', grpc.credentials.createInsecure());
         cliente.jugar(partida, function(error, resultado) {
-            if (error) {
-                console.log(error);
-            }
+            console.log("Peticion-http:", partida, "Resultado:", resultado, error)
         });
         return { "Juego": "Completado" };
     }

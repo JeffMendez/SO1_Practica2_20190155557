@@ -1,5 +1,4 @@
 syntax = "proto3";
-option go_package = "mel.ronald/juegos/pb";
 
 service Juegos {
     rpc Jugar (Partida) returns (Resultado);

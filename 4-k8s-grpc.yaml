@@ -1,0 +1,46 @@
+# Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grpc-deployment
+  namespace: practica2-201901557
+  labels:
+    app: grpc-deployment
+spec:
+  selector:
+    matchLabels:
+      app: grpc-deployment
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: grpc-deployment
+    spec:
+      # Pod
+      hostname: grpc-pod
+      containers:
+        - name: grpc-server
+          image: jeffmendezdk/server_grpc_201901557:latest
+          ports:
+            - containerPort: 5505
+        - name: grpc-client
+          image: jeffmendezdk/api_client_grpc_201901557:latest
+          ports:
+            - containerPort: 4505
+---
+# Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-grpc
+  namespace: practica2-201901557
+  labels:
+    app: grpc-deployment
+spec:
+  selector:
+    app: grpc-deployment
+  ports:
+    - port: 4505
+      targetPort: 4505
+      protocol: TCP
+  type: LoadBalancer

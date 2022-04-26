@@ -9,7 +9,7 @@ kubectl apply -f https://strimzi.io/examples/latest/kafka/kafka-persistent-singl
 kubectl wait kafka/my-cluster --for=condition=Ready --timeout=300s -n practica2-201901557 
 
 # Crear topic (en otra ventana y cerrar) 
-kubectl -n practica2-201901557 run kafka-producer -ti --image=quay.io/strimzi/kafka:0.28.0-kafka-3.1.0 --rm=true --restart=Never -- bin/kafka-console-producer.sh --bootstrap-server my-cluster-kafka-bootstrap:9092 --topic juegos -d
+kubectl -n practica2-201901557 run kafka-p -ti --image=quay.io/strimzi/kafka:0.28.0-kafka-3.1.0 --rm=true --restart=Never -- bin/kafka-console-producer.sh --bootstrap-server my-cluster-kafka-bootstrap:9092 --topic juegos
 #kubectl -n kafka run kafka-consumer -ti --image=quay.io/strimzi/kafka:0.28.0-kafka-3.1.0 --rm=true --restart=Never -- bin/kafka-console-consumer.sh --bootstrap-server my-cluster-kafka-bootstrap:9092 --topic juegos --from-beginning
 
 # Imagenes ---------------------------------------------------------------------------------------
@@ -55,4 +55,8 @@ kubectl logs podkakfa-sb -n practica2-201901557
 kubectl logs podgrpc-s -n practica2-201901557
 kubectl logs podgrpc-c -n practica2-201901557
 
+kubectl logs grpc-deployment-75f58844f9-7kwp8 grpc-server -n practica2-201901557
+kubectl logs grpc-deployment-75f58844f9-7kwp8 grpc-client -n practica2-201901557
+kubectl logs kafka-sub-deployment-59755c97ff-fnqjk kafka-subscriber -n practica2-201901557
 
+kubectl delete -f 
