@@ -1,4 +1,4 @@
-module mel.ronald/juegos
+module 201901557/juegos
 
 require (
 	github.com/optiopay/kafka/v2 v2.1.1

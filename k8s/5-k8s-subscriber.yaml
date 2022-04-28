@@ -23,20 +23,20 @@ spec:
           image: jeffmendezdk/kafka_subs_201901557:latest
           ports:
             - containerPort: 6505
----
+#---
 # Service
-apiVersion: v1
-kind: Service
-metadata:
-  name: service-subscriber
-  namespace: practica2-201901557
-  labels:
-    app: kafka-sub-deployment
-spec:
-  selector:
-    app: kafka-sub-deployment
-  ports:
-    - port: 6505
-      targetPort: 6505
-      protocol: TCP
-  type: LoadBalancer
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: service-subscriber
+#   namespace: practica2-201901557
+#   labels:
+#     app: kafka-sub-deployment
+# spec:
+#   selector:
+#     app: kafka-sub-deployment
+#   ports:
+#     - port: 6505
+#       targetPort: 6505
+#       protocol: TCP
+#   type: LoadBalancer

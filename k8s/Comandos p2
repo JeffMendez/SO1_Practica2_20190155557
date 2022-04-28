@@ -55,8 +55,14 @@ kubectl logs podkakfa-sb -n practica2-201901557
 kubectl logs podgrpc-s -n practica2-201901557
 kubectl logs podgrpc-c -n practica2-201901557
 
-kubectl logs grpc-deployment-75f58844f9-7kwp8 grpc-server -n practica2-201901557
-kubectl logs grpc-deployment-75f58844f9-7kwp8 grpc-client -n practica2-201901557
-kubectl logs kafka-sub-deployment-59755c97ff-fnqjk kafka-subscriber -n practica2-201901557
+watch kubectl logs grpc-deployment-75f58844f9-gpz2w grpc-server -n practica2-201901557
+watch kubectl logs grpc-deployment-75f58844f9-gpz2w grpc-client -n practica2-201901557
+watch kubectl logs kafka-sub-deployment-59755c97ff-l5cfq kafka-subscriber -n practica2-201901557
 
 kubectl delete -f 
+
+docker exec -it dbmongo mongo
+use LogsMongo
+db.auth('mongoadmin', 'So1pass1S_2022')
+db.auth('root', '')
+mongo mongoadmin -u mongoadmin -p

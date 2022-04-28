@@ -1,7 +1,7 @@
 package main
 
 import (
-    pb "mel.ronald/juegos/pb"
+    pb "201901557/juegos/pb"
     "context"
     "math/rand"
     "time"
@@ -64,12 +64,31 @@ func CartaMayor (jugadores int) int {
     return 1
 }
 
+func SillasMusicales (jugadores int) int {
+    rand.Seed(time.Now().UnixNano())
+    sillasNo := jugadores - 1
+    sillas := make([]int,sillasNo)
+    for {
+        for i := 0; i < sillasNo; i++ {
+            jugador := rand.Intn(jugadores + 1)
+            if jugador == 0 { jugador = 1; }
+            sillas[i] = jugador
+        }
+        if sillasNo == 1 { 
+            return sillas[0]; 
+        } else { 
+            sillasNo = sillasNo - 1; 
+        }
+    }
+    return 1
+}
+
 func jugarJuego (juego, jugadores int) int {
     if juego == 1 { return Ruleta(jugadores);
     } else if juego == 2 { return Dados(jugadores);
     } else if juego == 3 { return Dardos(jugadores);
     } else if juego == 4 { return CartaMayor(jugadores);
-    } else if juego == 5 { return Ruleta(jugadores); }
+    } else if juego == 5 { return SillasMusicales(jugadores); }
     return 1
 }
 
@@ -101,7 +120,7 @@ func (s *servidorJuegos) Jugar(contexto context.Context, partida *pb.Partida) (*
 func main () {
     lis, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%d", 5505))
     if err != nil { log.Fatalf("inicio fallido: %v",err); }
-    fmt.Println("Servidor iniciado")
+    fmt.Println("201901557 - Server gRPC iniciado")
     var opts []grpc.ServerOption
     grpcServer := grpc.NewServer(opts...)
     pb.RegisterJuegosServer(grpcServer, &servidorJuegos{})

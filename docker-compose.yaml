@@ -1,0 +1,26 @@
+version: "3.9" 
+services:
+  db:
+    image: mongo
+    container_name: dbmongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongoadmin
+      MONGO_INITDB_ROOT_PASSWORD: So1pass1S_2022
+    ports:
+      - "27017:27017"
+    restart: always
+    volumes:
+      - mongodata:/data/db
+    networks:
+      - p2-201901557
+
+volumes:
+  mongodata:
+
+networks:
+  p2-201901557:
+    name: "p2-201901557"
+    driver: bridge
+
+
+    

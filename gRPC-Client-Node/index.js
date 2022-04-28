@@ -14,12 +14,6 @@ var packageDefinition = protoLoader.loadSync(
 var protoDescriptor = grpc.loadPackageDefinition(packageDefinition);
 var juegos = protoDescriptor.Juegos;
 
-const env = require('node-getenv')
-
-function aleatorio (min,max) {
-    return Math.floor(Math.random() * (max - min) + min);
-}
-
 const servidor = Hapi.server({
     port: 4505,
     host: '0.0.0.0',
@@ -30,27 +24,26 @@ servidor.route({
     path: '/',
     options: { cors: true },
     handler: function (solicitud, h) {
-        return { "servidor": "funcionando.." };
+        return { "cliente-gRPC": "201901557-JM" };
     }
 });
 
 servidor.route({
     method: 'POST',
-    path: '/jugar',
+    path: '/juego',
     options: { cors: true },
     handler: function (request, h) {
-        // JUEGO
-        var partida = request.payload;
+        var partida = { Juego: request.payload.game_id, Jugadores: request.payload.players } 
         cliente = new juegos('0.0.0.0:5505', grpc.credentials.createInsecure());
         cliente.jugar(partida, function(error, resultado) {
-            console.log("Peticion-http:", partida, "Resultado:", resultado, error)
+            console.log(" -> Respuesta del servidor: ", partida, resultado)
         });
-        return { "Juego": "Completado" };
+        return { "Juego": "Procesado en Kafka", "Error": 0 };
     }
 });
 
 const init = async () => {
-    console.log("Cliente iniciado")
+    console.log("201901557 - Cliente gRPC iniciado")
     await servidor.start();
 };
 
